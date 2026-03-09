@@ -443,27 +443,28 @@ def render_documents_tab(analysis):
     )
 
     if input_method == "Upload File":
-        uploaded_file = st.file_uploader(
+        uploaded_files = st.file_uploader(
             "Upload PDF or DOCX",
             type=["pdf", "docx"],
+            accept_multiple_files=True,
             key=f"file_upload_{analysis.id}",
         )
-        if uploaded_file:
-            ext = Path(uploaded_file.name).suffix.lower().lstrip(".")
-            source_type = "pdf" if ext == "pdf" else "docx"
-            col1, col2 = st.columns([3, 1])
-            col1.write(f"**{uploaded_file.name}** ({uploaded_file.size:,} bytes)")
-            if col2.button("Add Document", key=f"add_file_{analysis.id}", type="primary"):
+        if uploaded_files:
+            st.write(f"{len(uploaded_files)} file(s) selected")
+            if st.button("Add All Documents", key=f"add_file_{analysis.id}", type="primary"):
                 db = get_db()
                 if db:
                     try:
                         from backend.services.analysis_service import add_document_upload
-                        file_bytes = uploaded_file.read()
-                        doc = add_document_upload(db, analysis.id, uploaded_file.name, file_bytes, source_type)
-                        st.success(f"Added: {doc.source_name}")
+                        for uploaded_file in uploaded_files:
+                            ext = Path(uploaded_file.name).suffix.lower().lstrip(".")
+                            source_type = "pdf" if ext == "pdf" else "docx"
+                            file_bytes = uploaded_file.read()
+                            add_document_upload(db, analysis.id, uploaded_file.name, file_bytes, source_type)
+                        st.success(f"Added {len(uploaded_files)} document(s).")
                         st.rerun()
                     except Exception as e:
-                        st.error(f"Failed to add document: {e}")
+                        st.error(f"Failed to add document(s): {e}")
                     finally:
                         db.close()
 
