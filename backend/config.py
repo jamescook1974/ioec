@@ -6,7 +6,7 @@ DB_PATH = BASE_DIR / "ioec.db"
 TAXONOMY_PATH = BASE_DIR / "taxonomy" / "taxonomy_v1.json"
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-LLM_MODEL = "claude-opus-4-6"
+LLM_MODEL = "claude-haiku-4-5-20251001"
 LLM_MAX_TOKENS = 8000
 
 EXTRACTION_CONFIDENCE_MIN = float(os.getenv("EXTRACTION_CONFIDENCE_MIN", "0.55"))
