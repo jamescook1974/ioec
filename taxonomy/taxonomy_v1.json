@@ -1,0 +1,77 @@
+{
+  "version": "v1.0",
+  "categories": [
+    {
+      "id": "GOV",
+      "name": "Governance & Risk",
+      "description": "Policies, standards, risk management, compliance, audits, training, roles/responsibilities, exceptions, control ownership.",
+      "examples": ["Security training is completed annually.", "Exceptions must be approved and documented.", "Risk assessments are conducted annually."]
+    },
+    {
+      "id": "IAM",
+      "name": "Identity & Access Management",
+      "description": "Provisioning/deprovisioning, authentication, authorization, privileged access, access reviews, MFA, RBAC, SSO, password policies.",
+      "examples": ["MFA is required for administrative access.", "Access must be reviewed quarterly.", "Privileged accounts require separate credentials."]
+    },
+    {
+      "id": "LOG",
+      "name": "Logging, Monitoring & Detection",
+      "description": "Logging coverage, log access, retention, alerting, SIEM, monitoring, detection rules, security event review cadence, anomaly detection.",
+      "examples": ["Security logs are retained for 12 months.", "Alerts are reviewed daily.", "Failed login attempts are logged and alerted."]
+    },
+    {
+      "id": "VULN",
+      "name": "Vulnerability & Patch Management",
+      "description": "Vulnerability scanning, remediation SLAs, patching, dependency updates, penetration testing, bug bounty, secure configuration baselines.",
+      "examples": ["Critical vulnerabilities are remediated within 30 days.", "Penetration tests are conducted annually.", "Systems are scanned weekly for vulnerabilities."]
+    },
+    {
+      "id": "SDLC",
+      "name": "Secure SDLC & Change Management",
+      "description": "Code review, CI/CD controls, testing requirements, secrets management, threat modeling, change approvals, release management.",
+      "examples": ["Code changes require peer review before merge.", "Secrets must not be committed to source control.", "Threat modeling is required for new features."]
+    },
+    {
+      "id": "IR",
+      "name": "Incident Response",
+      "description": "Incident detection-to-triage, escalation, communications, customer notifications, postmortems, tabletop exercises, incident documentation.",
+      "examples": ["Incidents must be documented and reviewed post-closure.", "Security incidents are triaged within 4 hours.", "Tabletop exercises are conducted annually."]
+    },
+    {
+      "id": "DATA",
+      "name": "Data Security & Privacy",
+      "description": "Data classification, encryption, retention/deletion, data minimization, privacy notices, DSR handling, data access restrictions, key management.",
+      "examples": ["Customer data is encrypted in transit and at rest.", "Personal data is retained for no longer than 3 years.", "Encryption keys are rotated annually."]
+    },
+    {
+      "id": "TPRM",
+      "name": "Third-Party & Vendor Risk",
+      "description": "Vendor due diligence, security reviews, contractual controls, subprocessors, ongoing monitoring, onboarding/offboarding vendors.",
+      "examples": ["Vendors undergo security review before onboarding.", "Subprocessors must meet equivalent security standards.", "Vendor access is reviewed annually."]
+    },
+    {
+      "id": "BCDR",
+      "name": "Business Continuity & Resilience",
+      "description": "Backups, recovery testing, RTO/RPO, DR plans, uptime/availability commitments, resilience monitoring.",
+      "examples": ["Backups are tested quarterly.", "RTO is 4 hours for critical systems.", "DR plan is reviewed and tested annually."]
+    },
+    {
+      "id": "PHYS",
+      "name": "Physical & Endpoint Security",
+      "description": "Device security, MDM, EDR, endpoint hardening, office controls, facility access, asset handling in physical contexts.",
+      "examples": ["Corporate laptops must use full-disk encryption.", "Endpoint detection and response is deployed on all devices.", "Physical access to server rooms is logged."]
+    },
+    {
+      "id": "CUST",
+      "name": "Customer / Contractual Commitments",
+      "description": "External promises and contractual obligations: SLAs, audit rights, notification timelines, data use restrictions, reporting commitments.",
+      "examples": ["Customer will be notified within 72 hours of a breach.", "Customers may request audit reports annually.", "Data is used only for the contracted purpose."]
+    },
+    {
+      "id": "PROD",
+      "name": "Product / Fraud-Specific Controls",
+      "description": "Product-specific integrity/security controls: model security, fraud/abuse monitoring, decisioning auditability, customer-facing product control promises.",
+      "examples": ["High-risk transactions are subject to enhanced review.", "Fraud detection models are audited quarterly.", "Decisioning logic is logged for auditability."]
+    }
+  ]
+}
