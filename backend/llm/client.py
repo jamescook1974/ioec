@@ -13,7 +13,6 @@ def call_llm(system: str, user: str, max_tokens: int = LLM_MAX_TOKENS) -> str:
     with client.messages.stream(
         model=LLM_MODEL,
         max_tokens=max_tokens,
-        thinking={"type": "adaptive"},
         system=system,
         messages=[{"role": "user", "content": user}]
     ) as stream:
