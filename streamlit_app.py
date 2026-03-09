@@ -561,24 +561,34 @@ def render_results_tab(analysis):
         )
 
     if run_clicked:
-        with st.spinner(f"Running analysis on {doc_count} document(s)... This may take a few minutes."):
-            db = get_db()
-            if db:
-                try:
-                    from backend.services.analysis_service import run_analysis
-                    result = run_analysis(db, analysis.id, use_clustering=use_clustering)
-                    if "error" in result:
-                        st.error(f"Analysis error: {result['error']}")
-                    else:
-                        st.success(
-                            f"Analysis complete! Extracted {result.get('obligations_extracted', 0)} obligations "
-                            f"from {result.get('documents_processed', 0)} document(s)."
-                        )
-                        st.rerun()
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
-                finally:
-                    db.close()
+        progress_bar = st.progress(0.0)
+        status_text = st.empty()
+
+        def update_progress(fraction, message):
+            progress_bar.progress(min(fraction, 1.0))
+            status_text.info(f"⏳ {message}")
+
+        db = get_db()
+        if db:
+            try:
+                from backend.services.analysis_service import run_analysis
+                result = run_analysis(db, analysis.id, use_clustering=use_clustering, progress_callback=update_progress)
+                progress_bar.empty()
+                status_text.empty()
+                if "error" in result:
+                    st.error(f"Analysis error: {result['error']}")
+                else:
+                    st.success(
+                        f"Analysis complete! Extracted {result.get('obligations_extracted', 0)} obligations "
+                        f"from {result.get('documents_processed', 0)} document(s)."
+                    )
+                    st.rerun()
+            except Exception as e:
+                progress_bar.empty()
+                status_text.empty()
+                st.error(f"Analysis failed: {e}")
+            finally:
+                db.close()
 
     if obs_count == 0:
         st.info("No obligations extracted yet. Run the analysis above.")

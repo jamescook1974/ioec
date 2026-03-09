@@ -109,11 +109,19 @@ def _get_document_content(doc: Document) -> List[Dict]:
     return []
 
 
-def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True) -> Dict[str, Any]:
+def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True, progress_callback=None) -> Dict[str, Any]:
     """
     Run the full pipeline: ingest all documents, extract obligations, embed, cluster.
     Clears prior obligations/clusters for this analysis first.
+
+    progress_callback(fraction: float, message: str) is called at key stages.
     """
+    def _progress(fraction, message):
+        if progress_callback:
+            progress_callback(fraction, message)
+
+    _progress(0.02, "Clearing previous results...")
+
     # Clear prior data
     db.query(ClusterMember).filter(
         ClusterMember.cluster_id.in_(
@@ -129,9 +137,14 @@ def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True) -> 
         return {"error": "No documents found", "obligations_extracted": 0}
 
     all_obligations = []
+    n_docs = len(documents)
 
-    for doc in documents:
+    for i, doc in enumerate(documents):
+        # Progress spans 5% → 70% across all documents
+        doc_progress = 0.05 + (i / n_docs) * 0.65
+        _progress(doc_progress, f"Extracting obligations from '{doc.source_name}' ({i + 1}/{n_docs})...")
         logger.info(f"Processing document: {doc.source_name}")
+
         pages = _get_document_content(doc)
         if not pages:
             logger.warning(f"No content extracted from {doc.source_name}")
@@ -170,6 +183,8 @@ def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True) -> 
 
         db.commit()
 
+    _progress(0.72, f"Computing embeddings for {len(all_obligations)} obligations...")
+
     # Compute embeddings
     logger.info(f"Computing embeddings for {len(all_obligations)} obligations")
     statements = [o.normalized_statement for o in all_obligations]
@@ -184,6 +199,7 @@ def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True) -> 
 
     # Clustering
     if use_clustering and all_obligations:
+        _progress(0.88, "Clustering obligations...")
         logger.info("Running clustering")
         obs_dicts = []
         for obs in all_obligations:
@@ -216,6 +232,8 @@ def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True) -> 
                 db.add(cm)
 
         db.commit()
+
+    _progress(1.0, "Done!")
 
     return {
         "obligations_extracted": len(all_obligations),
