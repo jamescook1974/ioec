@@ -67,7 +67,7 @@ def extract_from_chunks(chunks: List[Dict[str, Any]], source_name: str, chunk_ca
     """Extract obligations from all chunks in parallel. Returns list of obligation dicts."""
     from concurrent.futures import ThreadPoolExecutor, as_completed
     all_obligations = []
-    max_workers = min(8, len(chunks))
+    max_workers = min(3, len(chunks))
     if max_workers == 0:
         return []
     futures = {}

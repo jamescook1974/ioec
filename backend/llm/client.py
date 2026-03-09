@@ -1,3 +1,4 @@
+import time
 import anthropic
 import logging
 from backend.config import ANTHROPIC_API_KEY, LLM_MODEL, LLM_MAX_TOKENS
@@ -8,15 +9,22 @@ def get_client() -> anthropic.Anthropic:
     return anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 def call_llm(system: str, user: str, max_tokens: int = LLM_MAX_TOKENS) -> str:
-    """Call Claude and return text response. Raises on failure."""
+    """Call Claude and return text response. Retries with backoff on rate limits."""
     client = get_client()
-    with client.messages.stream(
-        model=LLM_MODEL,
-        max_tokens=max_tokens,
-        system=system,
-        messages=[{"role": "user", "content": user}]
-    ) as stream:
-        return stream.get_final_message().content[-1].text
+    for attempt in range(5):
+        try:
+            with client.messages.stream(
+                model=LLM_MODEL,
+                max_tokens=max_tokens,
+                system=system,
+                messages=[{"role": "user", "content": user}]
+            ) as stream:
+                return stream.get_final_message().content[-1].text
+        except anthropic.RateLimitError as e:
+            wait = 2 ** (attempt + 2)  # 4s, 8s, 16s, 32s, 64s
+            logger.warning(f"Rate limit hit (attempt {attempt+1}), waiting {wait}s: {e}")
+            time.sleep(wait)
+    raise RuntimeError("Rate limit: exhausted retries")
 
 def call_llm_json(system: str, user: str, max_retries: int = 2) -> dict:
     """Call Claude expecting JSON response. Retries on parse failure."""
