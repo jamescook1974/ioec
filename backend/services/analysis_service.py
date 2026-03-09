@@ -155,7 +155,15 @@ def run_analysis(db: Session, analysis_id: str, use_clustering: bool = True, pro
             logger.warning(f"No chunks generated from {doc.source_name}")
             continue
 
-        raw_obligations = extract_from_chunks(chunks, doc.source_name)
+        chunks_done = [0]
+        n_chunks = len(chunks)
+
+        def chunk_callback(i=i, doc=doc, n_chunks=n_chunks, chunks_done=chunks_done):
+            chunks_done[0] += 1
+            frac = doc_progress + (chunks_done[0] / n_chunks) * (0.65 / n_docs)
+            _progress(min(frac, 0.70), f"Extracting '{doc.source_name}' ({i + 1}/{n_docs}) — chunk {chunks_done[0]}/{n_chunks}...")
+
+        raw_obligations = extract_from_chunks(chunks, doc.source_name, chunk_callback=chunk_callback)
 
         for obs_data in raw_obligations:
             obs = Obligation(
